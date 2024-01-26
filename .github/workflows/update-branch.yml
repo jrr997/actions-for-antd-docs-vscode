@@ -1,0 +1,50 @@
+on:
+  workflow_dispatch:
+
+  workflow_call:
+    inputs:
+      from:
+        required: true
+        type: string
+      to: 
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  update_docs:
+    runs-on: ubuntu-latest
+    name: A job to update the docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: "output"
+
+      - name: Fetch docs
+        id: fetch_docs
+        uses: jrr997/actions-test@dev
+        with:
+          ref: "${{ inputs.from }}"
+          token: "${{ secrets.token }}"
+
+      - name: Components Count
+        id: count
+        run: |
+          echo "count=${{ steps.fetch_docs.outputs.count }}" >> $GITHUB_OUTPUT
+          if [ "${{ steps.fetch_docs.outputs.count }}" -lt 50 ]; then
+            echo "Count is less than 50"
+            exit 1
+          fi
+
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: . # The folder the action should deploy.
+          branch: ${{ inputs.to }}
+          clean: true

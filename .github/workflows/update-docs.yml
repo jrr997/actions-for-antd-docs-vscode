@@ -1,0 +1,27 @@
+name: Update Docs
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  update_docs_v4:
+    uses: jrr997/actions-for-antd-docs-vscode/.github/workflows/update-branch.yml@master
+    permissions:
+      contents: write
+    with:
+      from: 4.x-stable
+      to: output4
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
+      
+  update_docs_v5:
+    uses: jrr997/actions-for-antd-docs-vscode/.github/workflows/update-branch.yml@master
+    permissions:
+      contents: write
+    with:
+      from: master
+      to: output
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}

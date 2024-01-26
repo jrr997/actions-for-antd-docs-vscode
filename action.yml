@@ -1,0 +1,17 @@
+name: 'Fetch Docs'
+description: 'Fetch docs and write output.json in workspace.'
+inputs:
+  token:
+    description: 'github token'
+    required: true
+    default: ''
+  ref:
+    description: 'github ref'
+    required: true
+    default: ''
+outputs:
+  count:
+    description: 'The number of components docs'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
