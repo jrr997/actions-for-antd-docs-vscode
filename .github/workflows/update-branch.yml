@@ -28,7 +28,7 @@ jobs:
 
       - name: Fetch docs
         id: fetch_docs
-        uses: jrr997/actions-test@dev
+        uses: jrr997/actions-for-antd-docs-vscode@master
         with:
           ref: "${{ inputs.from }}"
           token: "${{ secrets.token }}"
