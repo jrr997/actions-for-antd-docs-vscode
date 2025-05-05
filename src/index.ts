@@ -40,11 +40,10 @@ async function Main() {
     console.log('Fail component: ', item)
   })
 
-  // used to see if this action is working successfully
+  // To check if this action is working successfully
   const count = Object.keys(docsMap).length
   core.setOutput('count', count)
 
-  // write docsMap.json
   const filePath = path.join(process.env.GITHUB_WORKSPACE!, 'docsMap.json')
   fs.writeFileSync(filePath, JSON.stringify(docsMap), 'utf8')
 }
