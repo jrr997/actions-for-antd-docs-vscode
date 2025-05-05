@@ -1,8 +1,8 @@
 export const ANTD_GITHUB = {
   OWNER: 'ant-design',
   REPO: 'ant-design',
-  EN_DOC_NAME: 'index.en-US.md',
-  ZH_DOC_NAME: 'index.zh-CN.md',
+  EN_DOC_NAME: 'en-US.md',
+  ZH_DOC_NAME: 'zh-CN.md',
 } as const
 
 export enum DocsLang {

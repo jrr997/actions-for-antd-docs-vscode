@@ -36,11 +36,12 @@ export async function getComponentDirInfos(token: string, ref: string) {
 
 export async function getComponentsDocText(componentNames: string[], token: string, ref: string) {
   const queries = componentNames?.map(componentName => createQuery(componentName, ref))
+
   const { repository } = await graphql<{ repository: Record<string, null | { text: string }> }>(
     `
 query{
   repository(owner: "${ANTD_GITHUB.OWNER}", name: "${ANTD_GITHUB.REPO}") {
-    ${queries.join('\n')}
+    ${queries.join('\n')}${createTooltipShareQuery(ref)}
   }
 }
     `,
@@ -53,16 +54,36 @@ query{
   return repository
 }
 
+function createTooltipShareQuery(ref: string) {
+  if (ref.startsWith('4')) return ''
+  
+  const name = 'tooltipShared'
+  const zhName = `${name.replaceAll('-', splitText)}zh`
+  const enName = `${name.replaceAll('-', splitText)}en`
+  return `
+    ${zhName}: object(expression: "${ref}:components/tooltip/shared/sharedProps.${ANTD_GITHUB.ZH_DOC_NAME}") {
+      ... on Blob {
+        text
+      }
+    }
+    ${enName}: object(expression: "${ref}:components/tooltip/shared/sharedProps.${ANTD_GITHUB.EN_DOC_NAME}") {
+    ... on Blob {
+      text
+      }
+    }
+  `
+}
+
 function createQuery(componentName: string, ref: string) {
   const zhName = `${componentName.replaceAll('-', splitText)}zh`
   const enName = `${componentName.replaceAll('-', splitText)}en`
   return `
-      ${zhName}: object(expression: "${ref}:components/${componentName}/${ANTD_GITHUB.ZH_DOC_NAME}") {
+      ${zhName}: object(expression: "${ref}:components/${componentName}/index.${ANTD_GITHUB.ZH_DOC_NAME}") {
         ... on Blob {
           text
         }
       }
-      ${enName}: object(expression: "${ref}:components/${componentName}/${ANTD_GITHUB.EN_DOC_NAME}") {
+      ${enName}: object(expression: "${ref}:components/${componentName}/index.${ANTD_GITHUB.EN_DOC_NAME}") {
         ... on Blob {
           text
         }
