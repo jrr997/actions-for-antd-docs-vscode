@@ -28774,8 +28774,8 @@ exports.splitText = exports.excludeDirs = exports.DocsLang = exports.ANTD_GITHUB
 exports.ANTD_GITHUB = {
     OWNER: 'ant-design',
     REPO: 'ant-design',
-    EN_DOC_NAME: 'index.en-US.md',
-    ZH_DOC_NAME: 'index.zh-CN.md',
+    EN_DOC_NAME: 'en-US.md',
+    ZH_DOC_NAME: 'zh-CN.md',
 };
 var DocsLang;
 (function (DocsLang) {
@@ -28838,10 +28838,9 @@ function Main() {
         failDocs.forEach((item) => {
             console.log('Fail component: ', item);
         });
-        // used to see if this action is working successfully
+        // To check if this action is working successfully
         const count = Object.keys(docsMap).length;
         core.setOutput('count', count);
-        // write docsMap.json
         const filePath = path.join(process.env.GITHUB_WORKSPACE, 'docsMap.json');
         fs.writeFileSync(filePath, JSON.stringify(docsMap), 'utf8');
     });
@@ -28912,7 +28911,7 @@ function getComponentsDocText(componentNames, token, ref) {
         const { repository } = yield (0, graphql_1.graphql)(`
 query{
   repository(owner: "${config_1.ANTD_GITHUB.OWNER}", name: "${config_1.ANTD_GITHUB.REPO}") {
-    ${queries.join('\n')}
+    ${queries.join('\n')}${createTooltipShareQuery(ref)}
   }
 }
     `, {
@@ -28924,16 +28923,35 @@ query{
     });
 }
 exports.getComponentsDocText = getComponentsDocText;
+function createTooltipShareQuery(ref) {
+    if (ref.startsWith('4'))
+        return '';
+    const name = 'tooltipShared';
+    const zhName = `${name.replaceAll('-', config_1.splitText)}zh`;
+    const enName = `${name.replaceAll('-', config_1.splitText)}en`;
+    return `
+    ${zhName}: object(expression: "${ref}:components/tooltip/shared/sharedProps.${config_1.ANTD_GITHUB.ZH_DOC_NAME}") {
+      ... on Blob {
+        text
+      }
+    }
+    ${enName}: object(expression: "${ref}:components/tooltip/shared/sharedProps.${config_1.ANTD_GITHUB.EN_DOC_NAME}") {
+    ... on Blob {
+      text
+      }
+    }
+  `;
+}
 function createQuery(componentName, ref) {
     const zhName = `${componentName.replaceAll('-', config_1.splitText)}zh`;
     const enName = `${componentName.replaceAll('-', config_1.splitText)}en`;
     return `
-      ${zhName}: object(expression: "${ref}:components/${componentName}/${config_1.ANTD_GITHUB.ZH_DOC_NAME}") {
+      ${zhName}: object(expression: "${ref}:components/${componentName}/index.${config_1.ANTD_GITHUB.ZH_DOC_NAME}") {
         ... on Blob {
           text
         }
       }
-      ${enName}: object(expression: "${ref}:components/${componentName}/${config_1.ANTD_GITHUB.EN_DOC_NAME}") {
+      ${enName}: object(expression: "${ref}:components/${componentName}/index.${config_1.ANTD_GITHUB.EN_DOC_NAME}") {
         ... on Blob {
           text
         }
